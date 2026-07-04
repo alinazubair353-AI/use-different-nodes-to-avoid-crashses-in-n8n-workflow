@@ -1,0 +1,233 @@
+{
+  "name": "imp point in n8n workflows to avoid the overload data in crashes",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b53de28b-15c8-4a47-8d55-b9cc42ea5f08",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1mo5HCuauM-3VYo2LPA4kAE9RpzourW08NQOt_-cIe6Y",
+          "mode": "list",
+          "cachedResultName": "over load data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mo5HCuauM-3VYo2LPA4kAE9RpzourW08NQOt_-cIe6Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mo5HCuauM-3VYo2LPA4kAE9RpzourW08NQOt_-cIe6Y/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "723d1f55-bc0f-484f-a67d-671fa8a54f8f",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "c9RP0q7kXRGg1tmj",
+          "name": "OAUTH ACCOUNT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 2,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "4b744c15-796c-4943-8c34-3f70d1ac5c44",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get row(s) in sheet').item.json.email }}",
+        "subject": "hello guys!",
+        "emailType": "text",
+        "message": "=hello, {{ $('Get row(s) in sheet').item.json.name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        96
+      ],
+      "id": "00e1532d-86c0-4ad6-89a4-fe476fbcc4e5",
+      "name": "Send a message",
+      "webhookId": "d3469457-9fa6-4530-9414-f0ee7f6a3dcf",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HkDa3KmhfK22ObHC",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        96
+      ],
+      "id": "dc4dd7ff-bd8d-40e9-a59f-675ab50602a5",
+      "name": "Wait",
+      "webhookId": "b214c954-e7a2-4bbe-95a6-34d44e8da999"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "countUnique",
+              "field": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        0
+      ],
+      "id": "00a3bbf3-0418-47c5-a424-9d910d9c49f9",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "sendTo": "aysh4503@gmail.com",
+        "subject": "summarize email !",
+        "emailType": "text",
+        "message": " email r send",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1152,
+        1.4632789676840403
+      ],
+      "id": "16a00593-214b-419b-af25-244b67403b27",
+      "name": "Send a message1",
+      "webhookId": "28a99a62-f86d-47e5-bee6-a3aeb2120159",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "HkDa3KmhfK22ObHC",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4f659e59-3ce1-4b25-bdbc-5a04be741922",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "43fe3b721e3b45c84a8a0ead5c0e0d1cd07509446e9cf0223381c800ab5075dd"
+  },
+  "nodeGroups": [],
+  "id": "eyjtED9SyjESs5rZ",
+  "tags": []
+}
